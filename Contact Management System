@@ -1,0 +1,108 @@
+import csv
+
+# Global variable to store contacts
+contacts = {}
+
+# Function to display menu
+def display_menu():
+    print("\nContact Management System")
+    print("1. Add a new contact")
+    print("2. View all contacts")
+    print("3. Edit a contact")
+    print("4. Delete a contact")
+    print("5. Exit")
+
+# Function to add a new contact
+def add_contact():
+    name = input("Enter name: ")
+    phone = input("Enter phone number: ")
+    email = input("Enter email address: ")
+    if name in contacts:
+        print(f"Contact with name '{name}' already exists. Please use edit option to modify.")
+    else:
+        contacts[name] = (phone, email)
+        print(f"Contact '{name}' added successfully!")
+
+# Function to view all contacts
+def view_contacts():
+    if not contacts:
+        print("No contacts found.")
+    else:
+        print("\nAll Contacts:")
+        for name, contact_info in contacts.items():
+            print(f"Name: {name}, Phone: {contact_info[0]}, Email: {contact_info[1]}")
+
+# Function to edit a contact
+def edit_contact():
+    name = input("Enter the name of the contact to edit: ")
+    if name in contacts:
+        print(f"Current details for '{name}':")
+        print(f"Phone: {contacts[name][0]}")
+        print(f"Email: {contacts[name][1]}")
+        phone = input("Enter new phone number (leave blank to keep current): ").strip()
+        email = input("Enter new email address (leave blank to keep current): ").strip()
+        if phone:
+            contacts[name] = (phone, contacts[name][1])
+        if email:
+            contacts[name] = (contacts[name][0], email)
+        print("Contact updated successfully!")
+    else:
+        print(f"Contact '{name}' not found.")
+
+# Function to delete a contact
+def delete_contact():
+    name = input("Enter the name of the contact to delete: ")
+    if name in contacts:
+        del contacts[name]
+        print(f"Contact '{name}' deleted successfully!")
+    else:
+        print(f"Contact '{name}' not found.")
+
+# Function to save contacts to a CSV file
+def save_contacts_to_file(filename):
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Name', 'Phone', 'Email'])
+        for name, contact_info in contacts.items():
+            writer.writerow([name, contact_info[0], contact_info[1]])
+    print(f"Contacts saved to '{filename}' successfully!")
+
+# Function to load contacts from a CSV file
+def load_contacts_from_file(filename):
+    try:
+        with open(filename, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)  # Skip header row
+            for row in reader:
+                name, phone, email = row
+                contacts[name] = (phone, email)
+        print(f"Contacts loaded from '{filename}' successfully!")
+    except FileNotFoundError:
+        print(f"No existing contacts file found. Starting with an empty contact list.")
+
+# Main function
+def main():
+    contacts_file = 'contacts.csv'
+    load_contacts_from_file(contacts_file)
+
+    while True:
+        display_menu()
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            add_contact()
+        elif choice == '2':
+            view_contacts()
+        elif choice == '3':
+            edit_contact()
+        elif choice == '4':
+            delete_contact()
+        elif choice == '5':
+            save_contacts_to_file(contacts_file)
+            print("Exiting program. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter a number from 1 to 5.")
+
+if __name__ == "__main__":
+    main()
